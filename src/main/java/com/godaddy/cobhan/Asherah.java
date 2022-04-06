@@ -12,7 +12,7 @@ public class Asherah {
     public static byte[] EncryptString(String partitionId, String input) throws Exception {
         byte[] partitionBuf = Cobhan.StringToCBuffer(partitionId);
         byte[] inputBuf = Cobhan.StringToCBuffer(input);
-        byte[] outputBuf = Cobhan.AllocateCBuffer(NativeAsherah.EstimateBuffer(inputBuf.length, partitionBuf.length));
+        byte[] outputBuf = Cobhan.AllocateCBuffer(EstimateBuffer(inputBuf.length, partitionBuf.length));
         int result = NativeAsherah.EncryptToJson(partitionBuf, inputBuf, outputBuf);
         if(result != 0) {
             throw new Exception("Failed to EncryptToJson");

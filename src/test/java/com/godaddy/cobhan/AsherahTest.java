@@ -2,6 +2,8 @@ package com.godaddy.cobhan;
 
 import static org.junit.Assert.assertEquals;
 
+import java.util.concurrent.TimeUnit;
+
 import org.junit.Test;
 
 public class AsherahTest {
@@ -20,9 +22,17 @@ public class AsherahTest {
 
         Asherah.SetupJson(configJson);
         String input = "testString";
-        byte[] encrypted = Asherah.EncryptString("partitionId", "testString");
-        String output = Asherah.DecryptString("partitionId", encrypted);
+        final int iterations = 500000;
+        long s1 = System.nanoTime();        
+        for(int i = 0; i < iterations; i++) {            
+            byte[] encrypted = Asherah.EncryptString("partitionId", input);
+            String output = Asherah.DecryptString("partitionId", encrypted);
+            assertEquals(input, output);
+        }
+        long s2 = System.nanoTime();
+        long milliseconds = TimeUnit.MILLISECONDS.convert(s2 - s1, TimeUnit.NANOSECONDS);
+        System.out.printf("Result: %f milliseconds per round trip", (double)milliseconds / (double)iterations);
+        
         Asherah.Shutdown();
-        assertEquals(input, output);
     }
 }
