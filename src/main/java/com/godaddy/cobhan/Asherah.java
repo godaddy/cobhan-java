@@ -34,4 +34,14 @@ public class Asherah {
     public static void Shutdown() {
         NativeAsherah.Shutdown();
     }
+    
+    private static final int EstimatedEncryptionOverhead = 48;
+    private static final int EstimatedEnvelopeOverhead = 185;
+    private static final double Base64Overhead = 1.34;
+    private static int EstimatedIntermediateKeyOverhead = 1024; //TODO: Base this on the service and product name
+    
+    private static int EstimateBuffer(int dataLen, int partitionLen) {
+      double estimatedDataLen = (dataLen + EstimatedEncryptionOverhead) * Base64Overhead;
+      return (int)(EstimatedEnvelopeOverhead + EstimatedIntermediateKeyOverhead + partitionLen + estimatedDataLen);
+    }    
 }
