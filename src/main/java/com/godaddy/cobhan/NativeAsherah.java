@@ -1,14 +1,15 @@
 package com.godaddy.cobhan;
+import java.nio.ByteBuffer;
 import java.nio.file.Path;
 import java.nio.file.Paths;
 
 import com.sun.jna.Native;
 
 public class NativeAsherah {
-    public static native int SetupJson(byte[] configJson);
+    public static native int SetupJson(ByteBuffer configJson);
     public static native int EstimateBuffer(int dataLen, int partitionLen);
-    public static native int EncryptToJson(byte[] partitionId, byte[] data, byte[] json);
-    public static native int DecryptFromJson(byte[] partitionId, byte[] json, byte[] data); 
+    public static native int EncryptToJson(ByteBuffer partitionId, ByteBuffer data, ByteBuffer json);
+    public static native int DecryptFromJson(ByteBuffer partitionId, ByteBuffer json, ByteBuffer data); 
     public static native void Shutdown();
 
     static {

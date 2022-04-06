@@ -15,29 +15,29 @@ public class Cobhan
     static final int sizeof_int32 = 32 / 8;
     static final int minimum_cbuffer_size = 1024;
 
-    public static byte[] AllocateCBuffer(int length) {
+    public static ByteBuffer AllocateCBuffer(int length) {
         if(length < minimum_cbuffer_size) {
             length = minimum_cbuffer_size;
         }
 
-        ByteBuffer cbuffer = ByteBuffer.allocate(header_size + length);
+        ByteBuffer cbuffer = ByteBuffer.allocateDirect(header_size + length);
         cbuffer.order(ByteOrder.LITTLE_ENDIAN);
         cbuffer.putInt(length);
         cbuffer.putInt(0);
-        return cbuffer.array();
+        cbuffer.rewind();
+        return cbuffer;
     }
 
-    public static byte[] BufferToCBuffer(byte[] data) {
-        return ByteBuffer.allocate(header_size + data.length)
+    public static ByteBuffer BufferToCBuffer(ByteBuffer data) {
+        return ByteBuffer.allocateDirect(header_size + data.limit())
             .order(ByteOrder.LITTLE_ENDIAN)
-            .putInt(data.length)
+            .putInt(data.limit())
             .putInt(0)
-            .put(data, 0, data.length)
-            .array();
+            .put(data)
+            .rewind();
     }
 
-    public static byte[] CBufferToBuffer(byte[] buffer) throws IOException {
-        ByteBuffer cbuffer = ByteBuffer.wrap(buffer);
+    public static ByteBuffer CBufferToBuffer(ByteBuffer cbuffer) throws IOException {
         cbuffer.order(ByteOrder.LITTLE_ENDIAN);
         int length = cbuffer.getInt();        
         cbuffer.getInt(); //Skip reserved
@@ -46,10 +46,10 @@ public class Cobhan
         }
         byte[] data = new byte[length];
         cbuffer.get(data, 0, length);
-        return data;
+        return ByteBuffer.wrap(data);
     }
 
-    public static byte[] TempToBuffer(ByteBuffer cbuffer, int length) throws IOException {
+    public static ByteBuffer TempToBuffer(ByteBuffer cbuffer, int length) throws IOException {
         length = 0 - length;
         byte[] data = new byte[length];
         cbuffer.get(data, 0, length);
@@ -57,17 +57,17 @@ public class Cobhan
         Path tempFile = Paths.get(tempFileName);
         data = Files.readAllBytes(tempFile);
         Files.delete(tempFile);
-        return data;
+        return ByteBuffer.wrap(data);
     }
 
-    public static String CBufferToString(byte[] buffer) throws IOException {
-        byte[] bytes = CBufferToBuffer(buffer);
-        return new String(bytes, StandardCharsets.UTF_8);
+    public static String CBufferToString(ByteBuffer buffer) throws IOException {
+        ByteBuffer bytes = CBufferToBuffer(buffer);
+        return new String(bytes.array(), StandardCharsets.UTF_8);
     }
 
-    public static byte[] StringToCBuffer(String data) {
+    public static ByteBuffer StringToCBuffer(String data) {
         byte[] bytes = data.getBytes(StandardCharsets.UTF_8);
-        return BufferToCBuffer(bytes);
+        return BufferToCBuffer(ByteBuffer.wrap(bytes));
     }
     static String GetLibraryFileName(String libraryName) {
         if(!Platform.is64Bit()) {
