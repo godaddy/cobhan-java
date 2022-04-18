@@ -69,7 +69,7 @@ public class Cobhan
         byte[] bytes = data.getBytes(StandardCharsets.UTF_8);
         return BufferToCBuffer(bytes);
     }
-    static String GetLibraryFileName(String libraryName) {
+    public static String GetLibraryFileName(String libraryName) {
         if(!Platform.is64Bit()) {
             throw new UnsupportedOperationException("Non-64bit platform unsupported");
         }
